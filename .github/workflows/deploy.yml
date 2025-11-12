@@ -22,4 +22,4 @@ jobs:
     - uses: hyoo-ru/gh-deploy@v4.4.1
       if: github.ref == 'refs/heads/master'
       with:
-        folder: 'bog/bhelper/-'
+        folder: 'bog/bot/-'
