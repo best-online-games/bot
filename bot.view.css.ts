@@ -1,6 +1,10 @@
 namespace $.$$ {
 	
 	$mol_style_define( $bog_bot, {
+		Avatar:{
+			display:"flex", 
+			alignItems:"center"
+		},
 		
 		Attachments_preview: {
 			flex: {

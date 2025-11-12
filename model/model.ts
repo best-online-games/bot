@@ -9,9 +9,7 @@ namespace $ {
 		@ $mol_memo.method
 		override names(): string[] {
 			return [
-				'microsoft/phi-4-multimodal-instruct',
-				'openai/gpt-4o',
-				'xai/grok-3',
+				'openai/gpt-4o-mini',     // Same as gd/bot default, works well with JSON
 			]
 		}
 		
@@ -31,6 +29,7 @@ namespace $ {
 		/** Override request_body to handle multimodal messages */
 		@ $mol_mem_key
 		override request_body( model: string ) {
+			console.log('🔧 request_body() called for model:', model)
 			
 			const messages = this.history().map( msg => {
 				// If message has array content (multimodal), keep it as is
@@ -48,10 +47,9 @@ namespace $ {
 				return msg
 			})
 			
-			return JSON.stringify({
+			const body = {
 				model,
 				stream: false,
-				response_format: { type: 'json_object' },
 				messages: [
 					{ role: 'system', content: this.rules() },
 					... messages,
@@ -66,7 +64,14 @@ namespace $ {
 					},
 				}) ),
 				... this.params(),
-			})
+			}
+			
+			// Add response_format for JSON output
+			// Note: OpenAI requires "json" word in system message, which our rules contain
+			(body as any).response_format = { type: 'json_object' }
+			
+			console.log('📤 Request body:', JSON.stringify(body, null, 2).substring(0, 500) + '...')
+			return JSON.stringify(body)
 		}
 		
 	}

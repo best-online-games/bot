@@ -13,6 +13,30 @@ namespace $.$$ {
 	
 	export class $bog_bot extends $.$bog_bot {
 		
+		// Override rules to substitute language and ensure "json" keyword for OpenAI
+		@ $mol_mem
+		override rules() {
+			let rules = super.rules().replaceAll( '{lang}', this.$.$mol_locale.lang() )
+			// OpenAI requires the word "json" in messages when using json_object response format
+			if( !rules.toLowerCase().includes('json') ) {
+				rules = rules + ' Ответ должен быть в формате JSON.'
+			}
+			console.log('📜 rules:', rules.substring(0, 200) + '...')
+			return rules
+		}
+		
+		// Override digest to store/retrieve from session
+		override digest( next?: string ) {
+			if( next !== undefined ) {
+				console.log('📝 digest() WRITE:', next)
+			}
+			const result = this.$.$mol_state_session.value( 'digest', next ) ?? ''
+			if( next === undefined ) {
+				console.log('📖 digest() READ:', result)
+			}
+			return result
+		}
+		
 		// Override messages to add logging
 		override messages() {
 			console.log('📋 messages() called')
@@ -349,9 +373,28 @@ namespace $.$$ {
 			
 			try {
 				const resp = fork.response()
-				console.log('💬 Response received:', resp)
-				this.dialog_title( resp?.title )
-				this.digest( resp?.digest )
+				console.log('💬 Response received FULL:', JSON.stringify(resp, null, 2))
+				console.log('💬 resp.title:', resp?.title)
+				console.log('💬 resp.digest:', resp?.digest)
+				console.log('💬 resp.response:', resp?.response)
+				
+				if( resp?.title ) {
+					console.log('✅ Setting title:', resp.title)
+					this.dialog_title( resp.title )
+				} else {
+					console.log('❌ No title in response')
+				}
+				
+				if( resp?.digest ) {
+					console.log('✅ Setting digest:', resp.digest)
+					// Convert digest to string if it's an object
+					const digestStr = typeof resp.digest === 'string' 
+						? resp.digest 
+						: JSON.stringify(resp.digest, null, 2)
+					this.digest( digestStr )
+				} else {
+					console.log('❌ No digest in response')
+				}
 				this.history([ ... history, resp?.response ])
 			} catch( error: any ) {
 				console.error('❌ Communication error:', error)
