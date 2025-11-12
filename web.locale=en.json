@@ -1,0 +1,20 @@
+{
+	"$bog_bot_Prompt_audio_record_hint": "Hold to record audio",
+	"$bog_bot_Prompt_image_upload_hint": "Attach image",
+	"$bog_bot_Prompt_paste_hint": "Paste screenshot (Ctrl+V)",
+	"$bog_bot_Prompt_submit_hint": "Send",
+	"$bog_bot_Prompt_text_hint": "Ask something",
+	"$bog_bot_Remove_audio_hint": "Remove",
+	"$bog_bot_Remove_image_hint": "Remove",
+	"$gd_bot_Context_title": "Summary",
+	"$gd_bot_Prompt_submit_hint": "Send",
+	"$gd_bot_Prompt_text_hint": "Ask something",
+	"$gd_bot_Reset_hint": "Reset",
+	"$gd_bot_dialog_title": "Giper Bot",
+	"$mol_lights_toggle_hint": "Toggle lights",
+	"$mol_link_donate_hint": "Thank with a dollar",
+	"$mol_link_source_hint": "Source code",
+	"$mol_link_support_hint": "Discuss the project",
+	"$mol_text_code_Copy_hint": "Copy whole code",
+	"$mol_text_header_Link_hint": "Permalink to this section"
+}
