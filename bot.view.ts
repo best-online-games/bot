@@ -13,6 +13,16 @@ namespace $.$$ {
 	
 	export class $bog_bot extends $.$bog_bot {
 		
+		// Override messages to add logging
+		override messages() {
+			console.log('📋 messages() called')
+			const history = this.history()
+			console.log('📋 history length:', history.length)
+			const result = history.map( (_,i)=> this.Message(i) )
+			console.log('📋 messages result:', result)
+			return result
+		}
+		
 		// Override history to support multimodal messages (not just strings)
 		@ $mol_mem
 		history( next?: any[] ): any[] {

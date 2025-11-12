@@ -10,7 +10,6 @@ namespace $ {
 		override names(): string[] {
 			return [
 				'microsoft/phi-4-multimodal-instruct',
-				'meta-llama/Llama-3.2-90B-Vision-Instruct',
 				'openai/gpt-4o',
 				'xai/grok-3',
 			]
