@@ -6,6 +6,10 @@ $bog_bot $gd_bot
 	Lights null
 	Model? $bog_bot_model
 	Dialog $mol_page
+		body /
+			<= Status $mol_status
+				status <= communication null
+			<= Messages $mol_list
 		foot /
 			<= Avatar $mol_view sub / \🙂
 			<= Attachments_preview $mol_list

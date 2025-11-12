@@ -16,6 +16,12 @@ namespace $.$$ {
 		// Override history to support multimodal messages (not just strings)
 		@ $mol_mem
 		history( next?: any[] ): any[] {
+			if( next !== undefined ) {
+				console.log('📝 history() WRITE called, length:', next.length, 'content:', next)
+			} else {
+				const current = this.$.$mol_state_session.value( 'history' ) ?? $mol_maybe( this.$.$mol_state_arg.value( 'prompt' ) || null ) as any[]
+				console.log('📖 history() READ called, length:', (current as any[]).length)
+			}
 			// Call parent's storage directly like in $gd_bot
 			return this.$.$mol_state_session.value( 'history', next ) ?? $mol_maybe( this.$.$mol_state_arg.value( 'prompt' ) || null )
 		}
@@ -285,6 +291,7 @@ namespace $.$$ {
 		// Override communication to support multimodal
 		@ $mol_mem
 		override communication() {
+			console.log('💬💬💬 COMMUNICATION() CALLED 💬💬💬')
 			
 			const history = this.history()
 			console.log('💬 communication() called, history length:', history.length)
@@ -347,11 +354,13 @@ namespace $.$$ {
 		
 		// Override prompt_submit to include attachments
 		override prompt_submit() {
+			console.log('🔥🔥🔥 PROMPT_SUBMIT CALLED 🔥🔥🔥')
+			console.log('Stack trace:', new Error().stack)
+			
 			const text = this.prompt_text()
 			const images = this.attached_images()
 			const audio = this.attached_audio()
 			
-			console.log('📤 prompt_submit called')
 			console.log('📤 Text:', text)
 			console.log('📤 Images:', images.length)
 			console.log('📤 Audio:', audio.length)
@@ -362,10 +371,18 @@ namespace $.$$ {
 				return
 			}
 			
-			// If no attachments, use parent's method to maintain reactivity
+			// If no attachments, use same logic as parent but with our history()
 			if( images.length === 0 && audio.length === 0 ) {
-				console.log('📤 No attachments, calling parent prompt_submit()')
-				super.prompt_submit()
+				console.log('📤 No attachments, using same logic as parent')
+				console.log('📤 Current history:', this.history())
+				console.log('📤 Text to add:', text)
+				
+				// Same as parent: this.history([ ... this.history(), ... $mol_maybe( this.prompt_text() || null ) ])
+				this.history([ ... this.history(), ... $mol_maybe( text || null ) ])
+				
+				console.log('📤 After history update:', this.history())
+				this.prompt_text( '' )
+				console.log('📤 Text cleared')
 				return
 			}
 			
