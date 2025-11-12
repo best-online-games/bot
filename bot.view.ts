@@ -98,20 +98,34 @@ namespace $.$$ {
 			return next ?? false
 		}
 		
-		audio_start( event?: PointerEvent ) {
-			if( !event ) return
-			console.log('🎤 audio_start event')
-			event.preventDefault()
-			this.is_recording( true )
-			this.start_audio_recording()
-		}
-		
-		audio_stop( event?: PointerEvent ) {
-			if( !event ) return
-			console.log('🎤 audio_stop event')
-			event.preventDefault()
-			this.is_recording( false )
-			this.stop_audio_recording()
+		// Override Prompt_audio_record to attach pointer event listeners
+		@ $mol_mem
+		override Prompt_audio_record() {
+			const button = super.Prompt_audio_record()
+			const node = button.dom_node() as HTMLElement
+			
+			node.addEventListener('pointerdown', ( event ) => {
+				console.log('🎤 pointerdown event')
+				event.preventDefault()
+				this.is_recording( true )
+				this.start_audio_recording()
+			})
+			
+			node.addEventListener('pointerup', ( event ) => {
+				console.log('🎤 pointerup event')
+				event.preventDefault()
+				this.is_recording( false )
+				this.stop_audio_recording()
+			})
+			
+			node.addEventListener('pointercancel', ( event ) => {
+				console.log('🎤 pointercancel event')
+				event.preventDefault()
+				this.is_recording( false )
+				this.stop_audio_recording()
+			})
+			
+			return button
 		}
 		
 		@ $mol_action
@@ -344,9 +358,15 @@ namespace $.$$ {
 			console.log('📤 Images:', images.length)
 			console.log('📤 Audio:', audio.length)
 			
-			// If no attachments, use default behavior
+			// If no text and no attachments, do nothing
+			if( !text && images.length === 0 && audio.length === 0 ) {
+				console.log('📤 Nothing to send')
+				return
+			}
+			
+			// If no attachments, use parent's method to maintain reactivity
 			if( images.length === 0 && audio.length === 0 ) {
-				console.log('📤 No attachments, using default behavior')
+				console.log('📤 No attachments, calling parent prompt_submit()')
 				super.prompt_submit()
 				return
 			}

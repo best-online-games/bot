@@ -39,11 +39,6 @@ $bog_bot $gd_bot
 					sub / <= Prompt_paste_icon $mol_icon_content_paste
 				<= Prompt_audio_record $mol_button_minor
 					hint @ \Hold to record audio
-					event *
-						^
-						pointerdown?event <=> audio_start?event null
-						pointerup?event <=> audio_stop?event null
-						pointercancel?event <=> audio_stop?event null
 					sub /
 						<= Prompt_audio_icon $mol_icon_microphone
 						<= Recording_indicator $mol_view
