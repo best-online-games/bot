@@ -5,6 +5,17 @@ namespace $ {
 	 */
 	export class $bog_bot_model extends $mol_github_model {
 		
+		/** Override names to return multimodal models */
+		@ $mol_memo.method
+		override names(): string[] {
+			return [
+				'microsoft/phi-4-multimodal-instruct',
+				'meta-llama/Llama-3.2-90B-Vision-Instruct',
+				'openai/gpt-4o',
+				'xai/grok-3',
+			]
+		}
+		
 		/** Add user prompt with multimodal content support */
 		@ $mol_action
 		ask_multimodal( content: any ) {

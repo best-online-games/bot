@@ -15,13 +15,11 @@ namespace $.$$ {
 			maxWidth: '100px',
 			maxHeight: '100px',
 			objectFit: 'cover',
-			borderRadius: $mol_gap.round,
 			cursor: 'pointer',
 		},
 		
 		Attached_audio: {
 			padding: $mol_gap.text,
-			borderRadius: $mol_gap.round,
 			gap: $mol_gap.text,
 		},
 		

@@ -13,6 +13,15 @@ namespace $.$$ {
 	
 	export class $bog_bot extends $.$bog_bot {
 		
+		// Helper to access history from parent
+		get_history() {
+			return (this as any).history()
+		}
+		
+		set_history( value: any[] ) {
+			(this as any).history( value )
+		}
+		
 		@ $mol_mem
 		attached_images( next?: File[] ) {
 			return next ?? []
@@ -179,15 +188,15 @@ namespace $.$$ {
 		
 		// Preview attachments
 		@ $mol_mem
-		override attachments_preview(): string[] {
-			const preview: string[] = []
+		override attachments_preview(): readonly any[] {
+			const preview: any[] = []
 			
 			this.attached_images().forEach( (_, index) => {
-				preview.push( this.Attached_image_wrap( index ) as any )
+				preview.push( this.Attached_image_wrap( index ) )
 			})
 			
 			this.attached_audio().forEach( (_, index) => {
-				preview.push( this.Attached_audio_wrap( index ) as any )
+				preview.push( this.Attached_audio_wrap( index ) )
 			})
 			
 			return preview
@@ -265,7 +274,7 @@ namespace $.$$ {
 		@ $mol_mem
 		override communication() {
 			
-			const history = super.history()
+			const history = this.get_history()
 			console.log('💬 communication() called, history length:', history.length)
 			
 			if( history.length % 2 === 0 ) {
@@ -314,11 +323,11 @@ namespace $.$$ {
 				console.log('💬 Response received:', resp)
 				this.dialog_title( resp?.title )
 				this.digest( resp?.digest )
-				super.history([ ... history, resp?.response ])
+				this.set_history([ ... history, resp?.response ])
 			} catch( error: any ) {
 				console.error('❌ Communication error:', error)
 				if( $mol_fail_log( error ) ) {
-					super.history([ ... history, '📛' + error.message ])
+					this.set_history([ ... history, '📛' + error.message ])
 				}
 			}
 			
@@ -355,8 +364,8 @@ namespace $.$$ {
 				
 				console.log('📤 Adding to history:', message)
 				
-				const current_history = super.history()
-				super.history([
+				const current_history = this.get_history()
+				this.set_history([
 					... current_history,
 					message
 				])

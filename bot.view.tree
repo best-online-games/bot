@@ -5,11 +5,6 @@ $bog_bot $gd_bot
 	Support null
 	Lights null
 	Model? $bog_bot_model
-		names /
-			\microsoft/phi-4-multimodal-instruct
-			\meta-llama/Llama-3.2-90B-Vision-Instruct
-			\openai/gpt-4o
-			\xai/grok-3
 	Dialog $mol_page
 		foot /
 			<= Avatar $mol_view sub / \🙂
@@ -45,6 +40,7 @@ $bog_bot $gd_bot
 				<= Prompt_audio_record $mol_button_minor
 					hint @ \Hold to record audio
 					event *
+						^
 						pointerdown?event <=> audio_start?event null
 						pointerup?event <=> audio_stop?event null
 						pointercancel?event <=> audio_stop?event null
