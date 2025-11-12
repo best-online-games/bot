@@ -1,0 +1,63 @@
+$bog_bot $gd_bot
+	Space null
+	Sources null
+	Donate null
+	Support null
+	Lights null
+	Model? $bog_bot_model
+		names /
+			\microsoft/phi-4-multimodal-instruct
+			\meta-llama/Llama-3.2-90B-Vision-Instruct
+			\openai/gpt-4o
+			\xai/grok-3
+	Dialog $mol_page
+		foot /
+			<= Avatar $mol_view sub / \🙂
+			<= Attachments_preview $mol_list
+				rows <= attachments_preview /
+					<= Attached_image_wrap* $mol_view
+						sub /
+							<= Attached_image* $mol_image
+								uri <= attached_image_uri* \
+							<= Remove_image* $mol_button_minor
+								hint @ \Remove
+								click? <=> remove_image* null
+								sub / <= Remove_image_icon* $mol_icon_close
+					<= Attached_audio_wrap* $mol_view
+						sub /
+							<= Attached_audio* $mol_view
+								sub /
+									<= Attached_audio_icon* $mol_icon_microphone
+									<= Attached_audio_name* $mol_view sub / \
+							<= Remove_audio* $mol_button_minor
+								hint @ \Remove
+								click? <=> remove_audio* null
+								sub / <= Remove_audio_icon* $mol_icon_close
+			<= Prompt_attachments $mol_row sub /
+				<= Prompt_image_upload $mol_button_minor
+					hint @ \Attach image
+					click? <=> image_upload? null
+					sub / <= Prompt_image_icon $mol_icon_image
+				<= Prompt_paste $mol_button_minor
+					hint @ \Paste screenshot (Ctrl+V)
+					click? <=> paste_screenshot? null
+					sub / <= Prompt_paste_icon $mol_icon_content_paste
+				<= Prompt_audio_record $mol_button_minor
+					hint @ \Hold to record audio
+					event *
+						pointerdown?event <=> audio_start?event null
+						pointerup?event <=> audio_stop?event null
+						pointercancel?event <=> audio_stop?event null
+					sub /
+						<= Prompt_audio_icon $mol_icon_microphone
+						<= Recording_indicator $mol_view
+							sub / \⏺
+			<= Prompt_text $mol_textarea
+				hint @ \Ask something
+				value? <=> prompt_text? \
+				submit? <=> prompt_submit? null
+			<= Prompt_submit $mol_button_minor
+				hint @ \Send
+				click? <=> prompt_submit? 
+				sub /
+					<= Prompt_submit_icon $mol_icon_send
