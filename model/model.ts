@@ -47,31 +47,28 @@ namespace $ {
 				return msg
 			})
 			
-			const body = {
-				model,
-				stream: false,
-				messages: [
-					{ role: 'system', content: this.rules() },
-					... messages,
-				],
-				tools: [ ... this.tools() ].map( ([ name, info ])=> ({
-					type: "function",
-					function: {
-						name,
-						description: info.descr,
-						strict: true,
-						parameters: info.params,
-					},
-				}) ),
-				... this.params(),
-			}
-			
-			// Add response_format for JSON output
-			// Note: OpenAI requires "json" word in system message, which our rules contain
-			(body as any).response_format = { type: 'json_object' }
-			
-			console.log('📤 Request body:', JSON.stringify(body, null, 2).substring(0, 500) + '...')
-			return JSON.stringify(body)
+				const payload = {
+					model,
+					stream: false,
+					response_format: { type: 'json_object' },
+					messages: [
+						{ role: 'system', content: this.rules() },
+						... messages,
+					],
+					tools: [ ... this.tools() ].map( ([ name, info ])=> ({
+						type: "function",
+						function: {
+							name,
+							description: info.descr,
+							strict: true,
+							parameters: info.params,
+						},
+					}) ),
+					... this.params(),
+				}
+				
+				console.log('📤 Request body:', JSON.stringify(payload, null, 2).substring(0, 500) + '...')
+				return JSON.stringify(payload)
 		}
 		
 	}

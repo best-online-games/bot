@@ -11,15 +11,15 @@ namespace $.$$ {
 		input_audio: { data: string, format: string }
 	}
 	
-	export class $bog_bot extends $.$bog_bot {
+		export class $bog_bot extends $.$bog_bot {
 		
 		// Override rules to substitute language and ensure "json" keyword for OpenAI
 		@ $mol_mem
 		override rules() {
 			let rules = super.rules().replaceAll( '{lang}', this.$.$mol_locale.lang() )
-			// OpenAI requires the word "json" in messages when using json_object response format
+			// GitHub Models require the word "json" (lower-case) in any message when using response_format=json_object
 			if( !rules.toLowerCase().includes('json') ) {
-				rules = rules + ' Ответ должен быть в формате JSON.'
+				rules = rules + ' Ответ должен быть в формате json.'
 			}
 			console.log('📜 rules:', rules.substring(0, 200) + '...')
 			return rules
@@ -385,6 +385,9 @@ namespace $.$$ {
 					console.log('❌ No title in response')
 				}
 				
+				// Prepare updated history including assistant response
+				const updated_history = [ ... history, resp?.response ]
+				
 				if( resp?.digest ) {
 					console.log('✅ Setting digest:', resp.digest)
 					// Convert digest to string if it's an object
@@ -393,9 +396,10 @@ namespace $.$$ {
 						: JSON.stringify(resp.digest, null, 2)
 					this.digest( digestStr )
 				} else {
-					console.log('❌ No digest in response')
+					console.log('❌ No digest in response — generating fallback')
+					this.digest( this.fallback_digest( updated_history ) )
 				}
-				this.history([ ... history, resp?.response ])
+				this.history( updated_history )
 			} catch( error: any ) {
 				console.error('❌ Communication error:', error)
 				if( $mol_fail_log( error ) ) {
@@ -470,6 +474,29 @@ namespace $.$$ {
 			}).catch( error => {
 				console.error('❌ Error building multimodal content:', error)
 			})
+		}
+
+		// Build a simple digest when model omits it
+		fallback_digest( history: any[] ): string {
+			const lines: string[] = []
+			for( let i = 0; i < history.length; ++i ) {
+				const msg = history[i]
+				let text = ''
+				if( typeof msg === 'string' ) text = msg
+				else if( Array.isArray( msg ) ) {
+					// concatenate text parts from multimodal content
+					text = msg
+						.filter( (p: any)=> p?.type === 'text' )
+						.map( (p: any)=> p.text )
+						.join(' ')
+				}
+				text = (text ?? '').replace(/\s+/g, ' ').trim()
+				if( !text || text.startsWith('📛') ) continue
+				const who = i % 2 ? '🤖' : '🙂'
+				lines.push(`${who} ${text}`)
+			}
+			const head = 'Краткий пересказ диалога:'
+			return [ head, ... lines.slice( -10 ) ].join('\n')
 		}
 		
 	}
