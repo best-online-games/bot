@@ -13,10 +13,6 @@ $bog_bot $gd_bot
 				status <= communication null
 			<= Messages $mol_list
 				rows <= messages /
-			<= Digest_block $mol_labeler
-				title @ \Digest
-				Content <= Digest $mol_text
-					text <= digest? \
 		foot /
 			<= Avatar $mol_view sub / \🙂
 			<= Attachments_preview $mol_list
