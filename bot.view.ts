@@ -13,13 +13,11 @@ namespace $.$$ {
 	
 	export class $bog_bot extends $.$bog_bot {
 		
-		// Helper to access history from parent
-		get_history() {
-			return (this as any).history()
-		}
-		
-		set_history( value: any[] ) {
-			(this as any).history( value )
+		// Override history to support multimodal messages (not just strings)
+		@ $mol_mem
+		history( next?: any[] ): any[] {
+			// Call parent's storage directly like in $gd_bot
+			return this.$.$mol_state_session.value( 'history', next ) ?? $mol_maybe( this.$.$mol_state_arg.value( 'prompt' ) || null )
 		}
 		
 		@ $mol_mem
@@ -288,7 +286,7 @@ namespace $.$$ {
 		@ $mol_mem
 		override communication() {
 			
-			const history = this.get_history()
+			const history = this.history()
 			console.log('💬 communication() called, history length:', history.length)
 			
 			if( history.length % 2 === 0 ) {
@@ -337,11 +335,11 @@ namespace $.$$ {
 				console.log('💬 Response received:', resp)
 				this.dialog_title( resp?.title )
 				this.digest( resp?.digest )
-				this.set_history([ ... history, resp?.response ])
+				this.history([ ... history, resp?.response ])
 			} catch( error: any ) {
 				console.error('❌ Communication error:', error)
 				if( $mol_fail_log( error ) ) {
-					this.set_history([ ... history, '📛' + error.message ])
+					this.history([ ... history, '📛' + error.message ])
 				}
 			}
 			
@@ -384,17 +382,19 @@ namespace $.$$ {
 				
 				console.log('📤 Adding to history:', message)
 				
-				const current_history = this.get_history()
-				this.set_history([
+				// Use type assertion for history in async context
+				const self = this as any as $bog_bot
+				const current_history = self.history()
+				self.history([
 					... current_history,
 					message
 				])
 				
 				console.log('📤 History updated')
 				
-				this.prompt_text( '' )
-				this.attached_images([])
-				this.attached_audio([])
+				self.prompt_text( '' )
+				self.attached_images([])
+				self.attached_audio([])
 				
 				console.log('📤 Cleared attachments')
 			}).catch( error => {
